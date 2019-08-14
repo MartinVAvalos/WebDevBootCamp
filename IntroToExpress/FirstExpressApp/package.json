@@ -1,0 +1,15 @@
+{
+  "name": "firstexpressapp",
+  "version": "1.0.0",
+  "description": "First attempt at using Express",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Martin Vera",
+  "license": "ISC"
+}
