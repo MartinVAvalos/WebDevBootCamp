@@ -9,7 +9,7 @@ const   express     = require("express"),
         User        = require("./models/user"),
         seedDB      = require("./seeds");
 
-mongoose.connect("mongodb://localhost:27017/yelp_camp_v5", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/yelp_camp_v6", {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public")); //adds css, but doesn't link to it
 app.set("view engine", "ejs");
@@ -17,8 +17,15 @@ seedDB();
 
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
-    secret: "Once again Blue wins cutest dog!"
+    secret: "Once again Blue wins cutest dog!",
+    resave: false,
+    saveUninitialized: false //Lines resave and saveUninitialized are options we have to add
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate())); //method comes from file user.js under the line where passportLocalMongoose is plugged in
+passport.serializeUser(User.serializeUser()); //method from passportLocalMongoose as well
+passport.deserializeUser(User.deserializeUser()); //same with this method
 
 app.get("/", (req, res) => {
     res.render("landing");
@@ -115,6 +122,34 @@ app.post("/campgrounds/:id/comments", (req, res) => {
     //connect new comment to campground
     // redirect to campground show page
 });
+
+// ===========
+// AUTH ROUTES
+// ===========
+
+// show register form
+app.get("/register", (req,res) => {
+    res.render("register");
+});
+//handle sign up logic
+app.post("/register", (req,res) => {
+    var newUser = new User({username: req.body.username});
+    User.register(newUser, req.body.password, (err, user) => { //stored hashed password
+        if(err) {
+            console.log(err);
+            return res.render("register");
+        }
+        passport.authenticate("local")(req, res, () => { //local strategy
+            res.redirect("/campgrounds");
+        });
+    });
+});
+
+// show login form
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+
 
 app.listen(3000, () => {
     console.log("port 3000 server is now running!")
