@@ -149,7 +149,20 @@ app.post("/register", (req,res) => {
 app.get("/login", (req, res) => {
     res.render("login");
 });
+// handling login logic
+// app.post("/login", middleware, callback)
+app.post("/login", passport.authenticate("local", 
+    {
+        successRedirect: "/campgrounds", 
+        failureRedirect: "/login"
+    }), (req, res) => { 
+});
 
+// Logic Route
+app.get("/logout", (req, res) => {
+    req.logOut();
+    res.redirect("/campgrounds");
+})
 
 app.listen(3000, () => {
     console.log("port 3000 server is now running!")
