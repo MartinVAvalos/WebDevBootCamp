@@ -4,6 +4,7 @@ const   express     = require("express"),
         mongoose    = require("mongoose"),
         passport    = require("passport"),
         LocalStrategy = require("passport-local"),
+        methodOverride = require("method-override"),
         Campground  = require("./models/campground"), //We don't need  the .js. That's implicit.
         Comment     = require("./models/comment"),
         User        = require("./models/user"),
@@ -17,8 +18,10 @@ const   express     = require("express"),
 
 mongoose.connect("mongodb://localhost:27017/yelp_camp_v8", {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(__dirname + "/public")); //adds css, but doesn't link to it
 app.set("view engine", "ejs");
+app.use(express.static(__dirname + "/public")); //adds css, but doesn't link to it
+app.use(methodOverride("_method")); //it will look for whatever is inside ("") ~ _method 
+
 // seedDB();
 
 // PASSPORT CONFIGURATION
