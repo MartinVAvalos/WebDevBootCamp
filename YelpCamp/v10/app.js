@@ -17,6 +17,7 @@ const   express     = require("express"),
 
 
 mongoose.connect("mongodb://localhost:27017/yelp_camp_v8", {useNewUrlParser: true});
+mongoose.set('useFindAndModify', false); //To rid of deprication warning
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public")); //adds css, but doesn't link to it
