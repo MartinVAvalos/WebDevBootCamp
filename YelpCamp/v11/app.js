@@ -2,6 +2,7 @@ const   express     = require("express"),
         app         = express(), 
         bodyParser  = require("body-parser"),
         mongoose    = require("mongoose"),
+        flash       = require("connect-flash"),
         passport    = require("passport"),
         LocalStrategy = require("passport-local"),
         methodOverride = require("method-override"),
@@ -22,6 +23,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public")); //adds css, but doesn't link to it
 app.use(methodOverride("_method")); //it will look for whatever is inside ("") ~ _method 
+app.use(flash());
 
 // seedDB();
 
@@ -40,12 +42,14 @@ passport.deserializeUser(User.deserializeUser()); //same with this method
 //whatever function given in line bellow will be called on every route
 app.use(function(req, res, next) {
     res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 
-app.use("/campgrounds",campgroundsRoutes);
-app.use("/campgrounds/:id/comments",commentRoutes);
-app.use("/",indexRoutes); //doesn't need the '/', but you can
+app.use("/campgrounds", campgroundsRoutes);
+app.use("/campgrounds/:id/comments", commentRoutes);
+app.use("/", indexRoutes); //doesn't need the '/', but you can
                           // if you want to follow the pattern
 
 app.listen(3000, () => {

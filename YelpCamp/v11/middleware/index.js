@@ -7,7 +7,8 @@ var Comment = require('../models/comment');
 middlewareObj.checkCampgroundOwnership = (req, res, next) => {
     if(req.isAuthenticated()) {
         Campground.findById(req.params.id, (err, foundCampground) => {
-            if(err) {
+            if(err || !foundCampground) {  //!foundCampground checks if foundCampground is null, because bull is falsey
+                req.flash("error", "Campground not found");
                 res.redirect("back");
             }
             else {
@@ -16,12 +17,14 @@ middlewareObj.checkCampgroundOwnership = (req, res, next) => {
                     next();
                 }
                 else  {
+                req.flash("error", "You don't have permission to do that");
                     res.redirect("back");
                 }
             }
         });
     }
     else {
+        req.flash("error", "You need to logged in to do that");
         res.redirect("back");
     }
 };
@@ -29,7 +32,8 @@ middlewareObj.checkCampgroundOwnership = (req, res, next) => {
 middlewareObj.checkCommentOwnership = (req, res, next) => {
     if(req.isAuthenticated()) {
         Comment.findById(req.params.comment_id, (err, foundComment) => {
-            if(err) {
+            if(err || !foundComment) {
+                req.flash("error", "Comment not found");
                 res.redirect("back");
             }
             else {
@@ -52,7 +56,10 @@ middlewareObj.isLoggedIn = (req, res, next) =>  {
     if(req.isAuthenticated()) {
         return next();
     }
-    res.redirect("/login");
+    else {
+        req.flash("error", "You need to be logged in to do that");
+        return res.redirect("/login");
+    }
 }
 
 module.exports = middlewareObj;
